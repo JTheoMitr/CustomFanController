@@ -1,9 +1,7 @@
 package android.example.customfancontroller
 
 import android.content.Context
-import android.graphics.Paint
-import android.graphics.PointF
-import android.graphics.Typeface
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import kotlin.math.cos
@@ -46,6 +44,32 @@ class DialView @JvmOverloads constructor(
         val angle = startAngle + pos.ordinal * (Math.PI / 4)
         x = (radius * cos(angle)).toFloat() + width / 2
         y = (radius * sin(angle)).toFloat() + height / 2
+
+
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        // Set dial background color to green if selection not off.
+        paint.color = if (fanSpeed == FanSpeed.OFF) Color.GRAY else Color.GREEN
+
+        // Draw the dial.
+        canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, paint)
+
+        // Draw the indicator circle.
+        val markerRadius = radius + RADIUS_OFFSET_INDICATOR
+        pointPosition.computeXYForSpeed(fanSpeed, markerRadius)
+        paint.color = Color.BLACK
+        canvas.drawCircle(pointPosition.x, pointPosition.y, radius/12, paint)
+
+        // Draw the text labels.
+        val labelRadius = radius + RADIUS_OFFSET_LABEL
+        for (i in FanSpeed.values()) {
+            pointPosition.computeXYForSpeed(i, labelRadius)
+            val label = resources.getString(i.label)
+            canvas.drawText(label, pointPosition.x, pointPosition.y, paint)
+        }
+
     }
 
 
